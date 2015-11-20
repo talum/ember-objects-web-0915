@@ -34,14 +34,17 @@ var Programmer = Ember.Object.extend({
     return conferences.filterBy("keyNote", fullName);
 
   }),
-  conferenceNames: Ember.computed("conferences.@each.name", function(){
-    var conferences = this.get("conferences");
-    var names = [];
-    conferences.forEach((conference) => {
-      names.push(conference.name);
-    });
-    return names;
-  }),
+  conferenceNames: Ember.computed.mapBy("conferences", "name"),
+    // function(chore, name){
+
+    // var conferences = this.get("conferences");
+    // var names = [];
+    // conferences.forEach((conference) => {
+    //   names.push(conference.name);
+    // });
+    // return names;
+
+  // }),
   conferenceTotal: Ember.computed("conferences.[]", function(){
     var conferences = this.get("conferences");
     return conferences.length;
