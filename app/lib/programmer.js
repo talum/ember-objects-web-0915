@@ -53,12 +53,13 @@ var Programmer = Ember.Object.extend({
     var num = this.get("conferences").length;
     return `${this.nickName} is speaking at ${num} conferences`;
   }),
-  hasValidEmail: Ember.computed("email", function(){
-    if (this.get("email") === 'notValid' || this.get("email") === null ){ return false;
-    }else{
-      return true;
-    }
-  }),
+  hasValidEmail: Ember.computed.match('email', /^.+@.+\..+$/),
+  // Ember.computed("email", function(){
+  //   if (this.get("email") === 'notValid' || this.get("email") === null ){ return false;
+  //   }else{
+  //     return true;
+  //   }
+  // }),
   hasErrors: Ember.computed("errors", function(){
     if (this.get("errors").length > 0){
         return true;
