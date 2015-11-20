@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-var Programmer = Ember.Object.extend({
+export default Ember.Object.extend({
   firstName: null,
   lastName: null,
   nickName: null,
@@ -8,74 +8,39 @@ var Programmer = Ember.Object.extend({
   authorOf: null,
   email: null,
   conferences: [],
+  fullName: Ember.computed("firstName", "lastName", function(){
+    return `${this.get("firstName")} ${this.get("lastName")}`;
+  }),
   greet: function(){
-    return `Hi, My name is ${this.get("firstName")} ${this.get("lastName")}. You can call me ${this.nickName}`;
+    return `Hi, My name is ${this.get("fullName")}. You can call me ${this.get("nickName")}`;
   },
-  isOld: Ember.computed("age", function(){
-    if (this.get("age") > 30){
-      return true;
-    } else{
-      return false;
-    }
-  }),
-  wroteRuby: Ember.computed("authorOf", function(){
-    if (this.get("authorOf") === "Ruby"){
-      return true;
-    } else{
-      return false;
-    }
-  }),
+  isOld: Ember.computed.gte("age", 30),
+  wroteRuby: Ember.computed.equal("authorOf", "Ruby"),
   addConference: function(conference){
-    return this.get("conferences").pushObject(conference);
+    this.get("conferences").pushObject(conference);
   },
   keyNoteConferences: Ember.computed("conferences.@each.keyNote", function(){
-    var conferences = this.get("conferences");
-    var fullName = `${this.get("firstName")} ${this.get("lastName")}`;
-    return conferences.filterBy("keyNote", fullName);
-
+    return this.get("conferences").filterBy("keyNote", this.get("fullName"));
   }),
-  conferenceNames: Ember.computed.mapBy("conferences", "name"),
-    // function(chore, name){
-
-    // var conferences = this.get("conferences");
-    // var names = [];
-    // conferences.forEach((conference) => {
-    //   names.push(conference.name);
-    // });
-    // return names;
-
-  // }),
-  conferenceTotal: Ember.computed("conferences.[]", function(){
-    var conferences = this.get("conferences");
-    return conferences.length;
+  conferenceNames: Ember.computed("conferences.[]", "conferences.@each.name",function(){
+    return this.get("conferences").mapBy("name");
   }),
-  itinerary: Ember.computed("conferences.[]", function(){
-    var num = this.get("conferences").length;
-    return `${this.nickName} is speaking at ${num} conferences`;
+  conferenceTotal: Ember.computed.alias("conferences.length"),
+  itinerary: Ember.computed("nickName", "conferenceTotal", function(){
+    var num = this.get("conferenceTotal");
+    return `${this.get("nickName"} is speaking at ${num} conferences`;
   }),
   hasValidEmail: Ember.computed.match('email', /^.+@.+\..+$/),
-  // Ember.computed("email", function(){
-  //   if (this.get("email") === 'notValid' || this.get("email") === null ){ return false;
-  //   }else{
-  //     return true;
-  //   }
-  // }),
-  hasErrors: Ember.computed("errors", function(){
-    if (this.get("errors").length > 0){
-        return true;
-      } else{
-        return false;
-      }
-  }),
-  errors: Ember.computed("firstName", "lastName", "age", "hasValidEmail", function(){
-    var errors = [];
-    if(this.get("firstName")===null){
+  hasErrors: Ember.computed.notEmpty("errors"),
+  errors: Ember.computed("hasFirstName", "hasLastName", "hasAge", "hasValidEmail", function(){
+    let errors = [];
+    if(!this.get("hasFirstName")){
       errors.push("firstName cannot be blank");
     }
-    if(this.get("lastName")===null){
+    if(!this.get("hasLastName")){
       errors.push("lastName cannot be blank");
     }
-    if(this.get("age")===null){
+    if(!this.get("hasAge")){
       errors.push("age cannot be blank");
     }
     if(!this.get("hasValidEmail")){
@@ -83,25 +48,9 @@ var Programmer = Ember.Object.extend({
     }
     return errors;
   }),
-  isInvalid: Ember.computed("hasErrors", function(){
-    if (this.get("hasErrors")){
-      return true;
-    }else{
-      return false;
-    }    
-  }),
-  isValid: Ember.computed("hasErrors", function(){
-    if (this.get("hasErrors")){
-      return false;
-    } else{
-      return true;
-    }
-  })
+  hasFirstName: Ember.computed.notEmpty("firstName"),
+  hasLastName: Ember.computed.notEmpty("lastName"),
+  hasAge: Ember.computed.notEmpty("age"),
+  isValid: Ember.computed.and("hasFirstName", "hasLastName", "hasAge", "hasValidEmail"),
+  isInvalid: Ember.computed.not("isValid"),
 });
-
-export default Programmer;
-
-// export default Ember.Object.extend({
-
-// });
-
