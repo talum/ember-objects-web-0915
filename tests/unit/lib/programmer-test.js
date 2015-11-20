@@ -99,6 +99,7 @@ describe("Programmer", function(){
       expect(matz.get("hasErrors")).to.eq(true);
 
       matz.set('email', "matz@example.com");
+
       expect(matz.get("isValid")).to.eq(true);
       expect(matz.get("errors.length")).to.eq(0);
       expect(matz.get("hasErrors")).to.eq(false);
